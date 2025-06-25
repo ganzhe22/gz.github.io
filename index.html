@@ -1,0 +1,853 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>校园活动签到系统</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link href="https://cdn.jsdelivr.net/npm/font-awesome@4.7.0/css/font-awesome.min.css" rel="stylesheet">
+    <script>
+        tailwind.config = {
+            theme: {
+                extend: {
+                    colors: {
+                        primary: '#165DFF',
+                        secondary: '#36D399',
+                        accent: '#FF9F43',
+                        neutral: '#3D4451',
+                        'base-100': '#FFFFFF',
+                    },
+                    fontFamily: {
+                        inter: ['Inter', 'system-ui', 'sans-serif'],
+                    },
+                }
+            }
+        }
+    </script>
+    <style type="text/tailwindcss">
+        @layer utilities {
+            .content-auto {
+                content-visibility: auto;
+            }
+            .card-shadow {
+                box-shadow: 0 10px 15px -3px rgba(0, 0, 0, 0.1), 0 4px 6px -2px rgba(0, 0, 0, 0.05);
+            }
+            .card-hover {
+                transition: all 0.3s ease;
+            }
+            .card-hover:hover {
+                transform: translateY(-5px);
+                box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.1), 0 10px 10px -5px rgba(0, 0, 0, 0.04);
+            }
+        }
+    </style>
+</head>
+<body class="font-inter bg-gray-50 min-h-screen">
+    <div class="container mx-auto px-4 py-8 max-w-6xl">
+        <!-- 头部 -->
+        <header class="text-center mb-12">
+            <h1 class="text-[clamp(2rem,5vw,3.5rem)] font-bold text-primary mb-4">校园活动签到系统</h1>
+            <p class="text-lg text-gray-600 max-w-2xl mx-auto">请根据您的身份选择相应的签到选项</p>
+        </header>
+
+        <!-- 主内容区 -->
+        <main>
+            <!-- 第一页：选择身份 -->
+            <section id="page1" class="block">
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
+                    <!-- 班级代表 -->
+                    <div class="bg-white rounded-xl p-8 card-shadow card-hover border-t-4 border-primary">
+                        <div class="text-primary text-4xl mb-4">
+                            <i class="fa fa-users"></i>
+                        </div>
+                        <h2 class="text-xl font-bold mb-2">班级代表</h2>
+                        <p class="text-gray-600 mb-6">请填写班级信息和代表信息进行签到</p>
+                        <button id="classBtn" class="w-full bg-primary hover:bg-primary/90 text-white py-3 px-4 rounded-lg transition-all duration-300">
+                            选择
+                        </button>
+                    </div>
+
+                    <!-- 节目成员 -->
+                    <div class="bg-white rounded-xl p-8 card-shadow card-hover border-t-4 border-secondary">
+                        <div class="text-secondary text-4xl mb-4">
+                            <i class="fa fa-music"></i>
+                        </div>
+                        <h2 class="text-xl font-bold mb-2">节目成员</h2>
+                        <p class="text-gray-600 mb-6">请填写节目信息和人员情况进行签到</p>
+                        <button id="programBtn" class="w-full bg-secondary hover:bg-secondary/90 text-white py-3 px-4 rounded-lg transition-all duration-300">
+                            选择
+                        </button>
+                    </div>
+
+                    <!-- 优秀毕业生代表 -->
+                    <div class="bg-white rounded-xl p-8 card-shadow card-hover border-t-4 border-accent">
+                        <div class="text-accent text-4xl mb-4">
+                            <i class="fa fa-graduation-cap"></i>
+                        </div>
+                        <h2 class="text-xl font-bold mb-2">优秀毕业生代表</h2>
+                        <p class="text-gray-600 mb-6">请填写班级信息和代表信息进行签到</p>
+                        <button id="graduateBtn" class="w-full bg-accent hover:bg-accent/90 text-white py-3 px-4 rounded-lg transition-all duration-300">
+                            选择
+                        </button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- 第二页：表单页 -->
+            <section id="page2" class="hidden">
+                <div class="bg-white rounded-xl p-8 card-shadow mb-8">
+                    <div class="flex justify-between items-center mb-6">
+                        <h2 id="formTitle" class="text-2xl font-bold text-primary">班级代表签到</h2>
+                        <button id="backBtn" class="text-gray-500 hover:text-gray-700">
+                            <i class="fa fa-arrow-left mr-1"></i> 返回
+                        </button>
+                    </div>
+
+                    <form id="signForm">
+                        <!-- 班级全称 -->
+                        <div class="mb-6" id="classFullNameField">
+                            <label for="classFullName" class="block text-gray-700 font-medium mb-2">班级全称</label>
+                            <input type="text" id="classFullName" name="classFullName" placeholder="例如：20电子信息工程技术1班" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+                        </div>
+
+                        <!-- 代表姓名 -->
+                        <div class="mb-6" id="representativeNameField">
+                            <label for="representativeName" class="block text-gray-700 font-medium mb-2">代表姓名</label>
+                            <input type="text" id="representativeName" name="representativeName" placeholder="请输入您的姓名" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+                        </div>
+
+                        <!-- 班主任姓名 -->
+                        <div class="mb-6" id="headTeacherField">
+                            <label for="headTeacher" class="block text-gray-700 font-medium mb-2">班主任姓名</label>
+                            <input type="text" id="headTeacher" name="headTeacher" placeholder="请输入班主任姓名" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+                        </div>
+
+                        <!-- 所属系部 -->
+                        <div class="mb-6 hidden" id="departmentField">
+                            <label for="department" class="block text-gray-700 font-medium mb-2">所属系部</label>
+                            <input type="text" id="department" name="department" placeholder="例如：电子工程系" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+                        </div>
+
+                        <!-- 节目名称 -->
+                        <div class="mb-6 hidden" id="programNameField">
+                            <label for="programName" class="block text-gray-700 font-medium mb-2">节目名称</label>
+                            <input type="text" id="programName" name="programName" placeholder="请输入节目名称" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+                        </div>
+
+                        <!-- 人员是否到齐 -->
+                        <div class="mb-6 hidden" id="isPresentField">
+                            <label class="block text-gray-700 font-medium mb-2">人员是否到齐</label>
+                            <div class="flex space-x-4">
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="isPresent" value="是" class="form-radio text-primary">
+                                    <span class="ml-2">是</span>
+                                </label>
+                                <label class="inline-flex items-center">
+                                    <input type="radio" name="isPresent" value="否" class="form-radio text-primary">
+                                    <span class="ml-2">否</span>
+                                </label>
+                            </div>
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-primary hover:bg-primary/90 text-white py-3 px-6 rounded-lg transition-all duration-300 flex items-center">
+                                <i class="fa fa-check mr-2"></i> 提交
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 第三页：密码验证 -->
+            <section id="page3" class="hidden">
+                <div class="bg-white rounded-xl p-8 card-shadow max-w-md mx-auto">
+                    <div class="text-center mb-6">
+                        <div class="text-primary text-5xl mb-4">
+                            <i class="fa fa-lock"></i>
+                        </div>
+                        <h2 class="text-2xl font-bold text-primary">管理员登录</h2>
+                        <p class="text-gray-600 mt-2">请输入密码查看签到信息</p>
+                    </div>
+
+                    <form id="passwordForm">
+                        <div class="mb-6">
+                            <label for="password" class="block text-gray-700 font-medium mb-2">密码</label>
+                            <input type="password" id="password" name="password" placeholder="请输入密码" 
+                                class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+                        </div>
+
+                        <div class="flex justify-end">
+                            <button type="submit" class="bg-primary hover:bg-primary/90 text-white py-3 px-6 rounded-lg transition-all duration-300 flex items-center">
+                                <i class="fa fa-unlock-alt mr-2"></i> 登录
+                            </button>
+                        </div>
+                    </form>
+                </div>
+            </section>
+
+            <!-- 第四页：信息查看 -->
+            <section id="page4" class="hidden">
+                <div class="bg-white rounded-xl p-8 card-shadow mb-6">
+                    <div class="flex flex-col md:flex-row justify-between items-start md:items-center mb-6">
+                        <div>
+                            <h2 class="text-2xl font-bold text-primary">签到信息管理</h2>
+                            <p class="text-gray-600 mt-1">查看、筛选和管理所有签到信息</p>
+                        </div>
+                        <div class="mt-4 md:mt-0 flex space-x-3">
+                            <button id="exportBtn" class="bg-green-600 hover:bg-green-700 text-white py-2 px-4 rounded-lg transition-all duration-300 flex items-center">
+                                <i class="fa fa-download mr-2"></i> 导出数据
+                            </button>
+                            <button id="logoutBtn" class="bg-gray-200 hover:bg-gray-300 text-gray-700 py-2 px-4 rounded-lg transition-all duration-300 flex items-center">
+                                <i class="fa fa-sign-out mr-2"></i> 退出
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- 筛选区域 -->
+                    <div class="bg-gray-50 p-4 rounded-lg mb-6">
+                        <div class="flex flex-col md:flex-row gap-4">
+                            <div class="flex-1">
+                                <label class="block text-gray-700 font-medium mb-2">身份类型</label>
+                                <select id="filterType" class="w-full px-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+                                    <option value="all">全部类型</option>
+                                    <option value="class">班级代表</option>
+                                    <option value="program">节目成员</option>
+                                    <option value="graduate">优秀毕业生代表</option>
+                                </select>
+                            </div>
+                            <div class="flex-1">
+                                <label class="block text-gray-700 font-medium mb-2">搜索</label>
+                                <div class="relative">
+                                    <input type="text" id="searchInput" placeholder="输入关键词搜索..." 
+                                        class="w-full pl-10 pr-4 py-2 border border-gray-300 rounded-lg focus:ring-2 focus:ring-primary focus:border-primary transition-all">
+                                    <div class="absolute left-3 top-1/2 transform -translate-y-1/2 text-gray-400">
+                                        <i class="fa fa-search"></i>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- 表格区域 -->
+                    <div class="overflow-x-auto">
+                        <table class="min-w-full divide-y divide-gray-200">
+                            <thead class="bg-gray-50">
+                                <tr>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">序号</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">身份类型</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">班级全称</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">代表姓名</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">班主任姓名</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">所属系部</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">节目名称</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">人员是否到齐</th>
+                                    <th scope="col" class="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider">操作</th>
+                                </tr>
+                            </thead>
+                            <tbody id="dataTable" class="bg-white divide-y divide-gray-200">
+                                <!-- 数据将通过JavaScript动态填充 -->
+                                <tr class="text-center">
+                                    <td colspan="9" class="px-6 py-12 text-gray-500">
+                                        <div class="flex flex-col items-center">
+                                            <i class="fa fa-folder-open-o text-4xl mb-3 text-gray-300"></i>
+                                            <p>暂无签到数据</p>
+                                        </div>
+                                    </td>
+                                </tr>
+                            </tbody>
+                        </table>
+                    </div>
+
+                    <!-- 分页区域 -->
+                    <div class="flex justify-between items-center mt-6">
+                        <div class="text-sm text-gray-600">
+                            显示 <span id="startIndex">0</span> 到 <span id="endIndex">0</span> 条，共 <span id="totalItems">0</span> 条
+                        </div>
+                        <div class="flex space-x-2" id="paginationControls">
+                            <!-- 分页按钮将通过JavaScript动态填充 -->
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <!-- 页脚 -->
+        <footer class="mt-16 text-center text-gray-500 text-sm">
+            <p>© 2025 校园活动签到系统 | 技术支持: 学校信息中心</p>
+        </footer>
+    </div>
+
+    <!-- 查看信息入口 -->
+    <div class="fixed bottom-6 right-6">
+        <button id="viewDataBtn" class="bg-primary hover:bg-primary/90 text-white p-4 rounded-full shadow-lg transition-all duration-300 transform hover:scale-110">
+            <i class="fa fa-bar-chart text-xl"></i>
+        </button>
+    </div>
+
+    <!-- 成功提示框 -->
+    <div id="successToast" class="fixed top-6 right-6 bg-secondary text-white px-6 py-3 rounded-lg shadow-lg transform translate-x-full transition-transform duration-500 flex items-center">
+        <i class="fa fa-check-circle mr-2"></i>
+        <span id="toastMessage">操作成功</span>
+    </div>
+
+    <!-- 删除确认模态框 -->
+    <div id="deleteModal" class="fixed inset-0 bg-black bg-opacity-50 flex items-center justify-center z-50 hidden">
+        <div class="bg-white rounded-xl p-8 max-w-md w-full mx-4">
+            <div class="text-center mb-6">
+                <div class="inline-flex items-center justify-center w-16 h-16 rounded-full bg-red-100 text-red-500 mb-4">
+                    <i class="fa fa-trash text-2xl"></i>
+                </div>
+                <h3 class="text-xl font-bold text-gray-900">确认删除</h3>
+                <p class="text-gray-500 mt-2">你确定要删除这条签到信息吗？此操作无法撤销。</p>
+            </div>
+            <div class="flex space-x-4">
+                <button id="cancelDeleteBtn" class="flex-1 bg-gray-200 hover:bg-gray-300 text-gray-700 py-3 px-4 rounded-lg transition-all duration-300">
+                    取消
+                </button>
+                <button id="confirmDeleteBtn" class="flex-1 bg-red-600 hover:bg-red-700 text-white py-3 px-4 rounded-lg transition-all duration-300">
+                    确认删除
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // 数据存储
+        let signData = [];
+        let currentPage = 1;
+        let itemsPerPage = 10;
+        let filteredData = [];
+        let selectedItemId = null;
+
+        // DOM元素
+        const page1 = document.getElementById('page1');
+        const page2 = document.getElementById('page2');
+        const page3 = document.getElementById('page3');
+        const page4 = document.getElementById('page4');
+        const formTitle = document.getElementById('formTitle');
+        const signForm = document.getElementById('signForm');
+        const passwordForm = document.getElementById('passwordForm');
+        const classBtn = document.getElementById('classBtn');
+        const programBtn = document.getElementById('programBtn');
+        const graduateBtn = document.getElementById('graduateBtn');
+        const backBtn = document.getElementById('backBtn');
+        const viewDataBtn = document.getElementById('viewDataBtn');
+        const logoutBtn = document.getElementById('logoutBtn');
+        const exportBtn = document.getElementById('exportBtn');
+        const filterType = document.getElementById('filterType');
+        const searchInput = document.getElementById('searchInput');
+        const dataTable = document.getElementById('dataTable');
+        const paginationControls = document.getElementById('paginationControls');
+        const startIndex = document.getElementById('startIndex');
+        const endIndex = document.getElementById('endIndex');
+        const totalItems = document.getElementById('totalItems');
+        const successToast = document.getElementById('successToast');
+        const toastMessage = document.getElementById('toastMessage');
+        const deleteModal = document.getElementById('deleteModal');
+        const cancelDeleteBtn = document.getElementById('cancelDeleteBtn');
+        const confirmDeleteBtn = document.getElementById('confirmDeleteBtn');
+
+        // 字段元素
+        const classFullNameField = document.getElementById('classFullNameField');
+        const representativeNameField = document.getElementById('representativeNameField');
+        const headTeacherField = document.getElementById('headTeacherField');
+        const departmentField = document.getElementById('departmentField');
+        const programNameField = document.getElementById('programNameField');
+        const isPresentField = document.getElementById('isPresentField');
+
+        // 初始化
+        init();
+
+        function init() {
+            // 加载本地存储数据
+            loadData();
+            
+            // 事件监听
+            classBtn.addEventListener('click', () => showForm('class'));
+            programBtn.addEventListener('click', () => showForm('program'));
+            graduateBtn.addEventListener('click', () => showForm('graduate'));
+            backBtn.addEventListener('click', showPage1);
+            viewDataBtn.addEventListener('click', showPage3);
+            logoutBtn.addEventListener('click', showPage1);
+            exportBtn.addEventListener('click', exportData);
+            signForm.addEventListener('submit', handleFormSubmit);
+            passwordForm.addEventListener('submit', handlePasswordSubmit);
+            filterType.addEventListener('change', filterData);
+            searchInput.addEventListener('input', filterData);
+            cancelDeleteBtn.addEventListener('click', () => deleteModal.classList.add('hidden'));
+            confirmDeleteBtn.addEventListener('click', deleteSelectedItem);
+            
+            // 初始化数据显示
+            updateTable();
+        }
+
+        // 页面切换函数
+        function showPage1() {
+            page1.classList.remove('hidden');
+            page2.classList.add('hidden');
+            page3.classList.add('hidden');
+            page4.classList.add('hidden');
+        }
+
+        function showPage2() {
+            page1.classList.add('hidden');
+            page2.classList.remove('hidden');
+            page3.classList.add('hidden');
+            page4.classList.add('hidden');
+        }
+
+        function showPage3() {
+            page1.classList.add('hidden');
+            page2.classList.add('hidden');
+            page3.classList.remove('hidden');
+            page4.classList.add('hidden');
+        }
+
+        function showPage4() {
+            page1.classList.add('hidden');
+            page2.classList.add('hidden');
+            page3.classList.add('hidden');
+            page4.classList.remove('hidden');
+        }
+
+        // 显示表单并设置表单类型
+        function showForm(type) {
+            // 重置表单
+            signForm.reset();
+            
+            // 隐藏所有字段
+            classFullNameField.classList.add('hidden');
+            representativeNameField.classList.add('hidden');
+            headTeacherField.classList.add('hidden');
+            departmentField.classList.add('hidden');
+            programNameField.classList.add('hidden');
+            isPresentField.classList.add('hidden');
+            
+            // 根据类型显示相应字段
+            switch(type) {
+                case 'class':
+                    formTitle.textContent = '班级代表签到';
+                    classFullNameField.classList.remove('hidden');
+                    representativeNameField.classList.remove('hidden');
+                    headTeacherField.classList.remove('hidden');
+                    signForm.setAttribute('data-type', 'class');
+                    break;
+                case 'program':
+                    formTitle.textContent = '节目成员签到';
+                    departmentField.classList.remove('hidden');
+                    programNameField.classList.remove('hidden');
+                    representativeNameField.classList.remove('hidden');
+                    isPresentField.classList.remove('hidden');
+                    signForm.setAttribute('data-type', 'program');
+                    break;
+                case 'graduate':
+                    formTitle.textContent = '优秀毕业生代表签到';
+                    classFullNameField.classList.remove('hidden');
+                    representativeNameField.classList.remove('hidden');
+                    headTeacherField.classList.remove('hidden');
+                    signForm.setAttribute('data-type', 'graduate');
+                    break;
+            }
+            
+            showPage2();
+        }
+
+        // 处理表单提交
+        function handleFormSubmit(e) {
+            e.preventDefault();
+            
+            const formType = signForm.getAttribute('data-type');
+            const formData = new FormData(signForm);
+            const newItem = {
+                id: Date.now().toString(),
+                type: formType,
+                timestamp: new Date().toISOString(),
+            };
+            
+            // 根据表单类型收集数据
+            switch(formType) {
+                case 'class':
+                    newItem.classFullName = formData.get('classFullName');
+                    newItem.representativeName = formData.get('representativeName');
+                    newItem.headTeacher = formData.get('headTeacher');
+                    break;
+                case 'program':
+                    newItem.department = formData.get('department');
+                    newItem.programName = formData.get('programName');
+                    newItem.representativeName = formData.get('representativeName');
+                    newItem.isPresent = formData.get('isPresent') || '未选择';
+                    break;
+                case 'graduate':
+                    newItem.classFullName = formData.get('classFullName');
+                    newItem.representativeName = formData.get('representativeName');
+                    newItem.headTeacher = formData.get('headTeacher');
+                    break;
+            }
+            
+            // 验证必填字段
+            if (!validateForm(newItem, formType)) {
+                return;
+            }
+            
+            // 添加到数据中
+            signData.push(newItem);
+            
+            // 保存到本地存储
+            saveData();
+            
+            // 显示成功提示
+            showToast('签到成功！');
+            
+            // 重置表单并返回首页
+            signForm.reset();
+            showPage1();
+            
+            // 更新表格
+            updateTable();
+        }
+
+        // 表单验证
+        function validateForm(data, type) {
+            let isValid = true;
+            
+            switch(type) {
+                case 'class':
+                    if (!data.classFullName) {
+                        isValid = false;
+                        showToast('请填写班级全称');
+                    } else if (!data.representativeName) {
+                        isValid = false;
+                        showToast('请填写代表姓名');
+                    } else if (!data.headTeacher) {
+                        isValid = false;
+                        showToast('请填写班主任姓名');
+                    }
+                    break;
+                case 'program':
+                    if (!data.department) {
+                        isValid = false;
+                        showToast('请填写所属系部');
+                    } else if (!data.programName) {
+                        isValid = false;
+                        showToast('请填写节目名称');
+                    } else if (!data.representativeName) {
+                        isValid = false;
+                        showToast('请填写主要负责人姓名');
+                    } else if (!data.isPresent || data.isPresent === '未选择') {
+                        isValid = false;
+                        showToast('请选择人员是否到齐');
+                    }
+                    break;
+                case 'graduate':
+                    if (!data.classFullName) {
+                        isValid = false;
+                        showToast('请填写班级全称');
+                    } else if (!data.representativeName) {
+                        isValid = false;
+                        showToast('请填写代表姓名');
+                    } else if (!data.headTeacher) {
+                        isValid = false;
+                        showToast('请填写班主任姓名');
+                    }
+                    break;
+            }
+            
+            return isValid;
+        }
+
+        // 处理密码提交
+        function handlePasswordSubmit(e) {
+            e.preventDefault();
+            
+            const password = document.getElementById('password').value;
+            
+            if (password === 'qcsgz') {
+                showPage4();
+                passwordForm.reset();
+                showToast('登录成功！');
+            } else {
+                showToast('密码错误！');
+            }
+        }
+
+        // 过滤数据
+        function filterData() {
+            const typeFilter = filterType.value;
+            const searchTerm = searchInput.value.toLowerCase();
+            
+            filteredData = signData.filter(item => {
+                // 类型过滤
+                if (typeFilter !== 'all' && item.type !== typeFilter) {
+                    return false;
+                }
+                
+                // 搜索过滤
+                return Object.values(item).some(value => 
+                    value.toString().toLowerCase().includes(searchTerm)
+                );
+            });
+            
+            currentPage = 1;
+            updateTable();
+        }
+
+        // 更新表格显示
+        function updateTable() {
+            if (!filteredData.length) {
+                filteredData = [...signData];
+            }
+            
+            const totalPages = Math.ceil(filteredData.length / itemsPerPage);
+            const startIdx = (currentPage - 1) * itemsPerPage;
+            const endIdx = Math.min(startIdx + itemsPerPage, filteredData.length);
+            const currentItems = filteredData.slice(startIdx, endIdx);
+            
+            // 更新表格内容
+            dataTable.innerHTML = '';
+            
+            if (currentItems.length === 0) {
+                dataTable.innerHTML = `
+                    <tr class="text-center">
+                        <td colspan="9" class="px-6 py-12 text-gray-500">
+                            <div class="flex flex-col items-center">
+                                <i class="fa fa-folder-open-o text-4xl mb-3 text-gray-300"></i>
+                                <p>暂无匹配数据</p>
+                            </div>
+                        </td>
+                    </tr>
+                `;
+            } else {
+                currentItems.forEach((item, index) => {
+                    const row = document.createElement('tr');
+                    row.className = index % 2 === 0 ? 'bg-white' : 'bg-gray-50';
+                    
+                    // 设置类型显示名称
+                    let typeDisplay = '';
+                    switch(item.type) {
+                        case 'class':
+                            typeDisplay = '班级代表';
+                            break;
+                        case 'program':
+                            typeDisplay = '节目成员';
+                            break;
+                        case 'graduate':
+                            typeDisplay = '优秀毕业生代表';
+                            break;
+                    }
+                    
+                    // 格式化时间
+                    const date = new Date(item.timestamp);
+                    const formattedDate = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                    
+                    row.innerHTML = `
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-500">${startIdx + index + 1}</td>
+                        <td class="px-6 py-4 whitespace-nowrap">
+                            <span class="px-2 inline-flex text-xs leading-5 font-semibold rounded-full ${item.type === 'class' ? 'bg-blue-100 text-blue-800' : item.type === 'program' ? 'bg-green-100 text-green-800' : 'bg-orange-100 text-orange-800'}">
+                                ${typeDisplay}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.classFullName || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.representativeName || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.headTeacher || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.department || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.programName || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm text-gray-900">${item.isPresent || '-'}</td>
+                        <td class="px-6 py-4 whitespace-nowrap text-sm font-medium">
+                            <button class="text-red-600 hover:text-red-900 delete-btn" data-id="${item.id}">
+                                <i class="fa fa-trash"></i> 删除
+                            </button>
+                        </td>
+                    `;
+                    
+                    dataTable.appendChild(row);
+                });
+                
+                // 添加删除按钮事件
+                document.querySelectorAll('.delete-btn').forEach(btn => {
+                    btn.addEventListener('click', (e) => {
+                        selectedItemId = e.currentTarget.getAttribute('data-id');
+                        deleteModal.classList.remove('hidden');
+                    });
+                });
+            }
+            
+            // 更新分页信息
+            startIndex.textContent = filteredData.length > 0 ? startIdx + 1 : 0;
+            endIndex.textContent = endIdx;
+            totalItems.textContent = filteredData.length;
+            
+            // 更新分页控件
+            paginationControls.innerHTML = '';
+            
+            if (totalPages > 1) {
+                // 添加首页按钮
+                addPaginationButton(1, '首页');
+                
+                // 添加前一页按钮
+                if (currentPage > 1) {
+                    addPaginationButton(currentPage - 1, '上一页');
+                }
+                
+                // 添加页码按钮
+                const maxVisiblePages = 5;
+                let startPage = Math.max(1, currentPage - Math.floor(maxVisiblePages / 2));
+                let endPage = Math.min(startPage + maxVisiblePages - 1, totalPages);
+                
+                if (endPage - startPage + 1 < maxVisiblePages) {
+                    startPage = Math.max(1, endPage - maxVisiblePages + 1);
+                }
+                
+                if (startPage > 1) {
+                    addPaginationButton(1, '1');
+                    if (startPage > 2) {
+                        addEllipsis();
+                    }
+                }
+                
+                for (let i = startPage; i <= endPage; i++) {
+                    addPaginationButton(i, i.toString(), i === currentPage);
+                }
+                
+                if (endPage < totalPages) {
+                    if (endPage < totalPages - 1) {
+                        addEllipsis();
+                    }
+                    addPaginationButton(totalPages, totalPages.toString());
+                }
+                
+                // 添加下一页按钮
+                if (currentPage < totalPages) {
+                    addPaginationButton(currentPage + 1, '下一页');
+                }
+                
+                // 添加尾页按钮
+                addPaginationButton(totalPages, '尾页');
+            }
+        }
+
+        // 添加分页按钮
+        function addPaginationButton(pageNum, text, isActive = false) {
+            const button = document.createElement('button');
+            button.textContent = text;
+            button.className = isActive 
+                ? 'bg-primary text-white px-4 py-2 rounded-lg transition-all duration-300' 
+                : 'bg-gray-200 hover:bg-gray-300 text-gray-700 px-4 py-2 rounded-lg transition-all duration-300';
+            
+            button.addEventListener('click', () => {
+                currentPage = pageNum;
+                updateTable();
+            });
+            
+            paginationControls.appendChild(button);
+        }
+
+        // 添加省略号
+        function addEllipsis() {
+            const span = document.createElement('span');
+            span.textContent = '...';
+            span.className = 'px-2 py-2 text-gray-500';
+            paginationControls.appendChild(span);
+        }
+
+        // 删除选中项
+        function deleteSelectedItem() {
+            if (selectedItemId) {
+                signData = signData.filter(item => item.id !== selectedItemId);
+                filteredData = filteredData.filter(item => item.id !== selectedItemId);
+                saveData();
+                updateTable();
+                deleteModal.classList.add('hidden');
+                showToast('删除成功！');
+            }
+        }
+
+        // 导出数据
+        function exportData() {
+            if (signData.length === 0) {
+                showToast('没有数据可导出！');
+                return;
+            }
+            
+            // 准备导出数据
+            const exportData = [...signData].map(item => {
+                // 复制并转换数据
+                const newItem = {...item};
+                
+                // 设置类型显示名称
+                switch(newItem.type) {
+                    case 'class':
+                        newItem.type = '班级代表';
+                        break;
+                    case 'program':
+                        newItem.type = '节目成员';
+                        break;
+                    case 'graduate':
+                        newItem.type = '优秀毕业生代表';
+                        break;
+                }
+                
+                // 格式化时间
+                const date = new Date(newItem.timestamp);
+                newItem.timestamp = `${date.getFullYear()}-${(date.getMonth()+1).toString().padStart(2, '0')}-${date.getDate().toString().padStart(2, '0')} ${date.getHours().toString().padStart(2, '0')}:${date.getMinutes().toString().padStart(2, '0')}`;
+                
+                return newItem;
+            });
+            
+            // 创建CSV内容
+            const header = Object.keys(exportData[0]).join(',');
+            const rows = exportData.map(item => Object.values(item).map(value => {
+                // 处理包含逗号或引号的值
+                if (typeof value === 'string' && (value.includes(',') || value.includes('"'))) {
+                    return `"${value.replace(/"/g, '""')}"`;
+                }
+                return value;
+            }).join(','));
+            
+            const csvContent = [header, ...rows].join('\n');
+            
+            // 创建下载链接
+            const blob = new Blob([csvContent], { type: 'text/csv;charset=utf-8;' });
+            const url = URL.createObjectURL(blob);
+            const link = document.createElement('a');
+            link.setAttribute('href', url);
+            link.setAttribute('download', `签到信息_${new Date().toISOString().split('T')[0]}.csv`);
+            link.style.visibility = 'hidden';
+            
+            document.body.appendChild(link);
+            link.click();
+            document.body.removeChild(link);
+            
+            showToast('数据导出成功！');
+        }
+
+        // 显示提示框
+        function showToast(message) {
+            toastMessage.textContent = message;
+            successToast.classList.remove('translate-x-full');
+            
+            setTimeout(() => {
+                successToast.classList.add('translate-x-full');
+            }, 3000);
+        }
+
+        // 保存数据到本地存储
+        function saveData() {
+            localStorage.setItem('signData', JSON.stringify(signData));
+        }
+
+        // 从本地存储加载数据
+        function loadData() {
+            const data = localStorage.getItem('signData');
+            if (data) {
+                signData = JSON.parse(data);
+            }
+        }
+    </script>
+</body>
+</html>
+    
